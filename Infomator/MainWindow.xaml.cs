@@ -29,6 +29,7 @@ namespace Infomator
     public partial class MainWindow : Window
     {
         private NewsProvider _NewsProvider;
+        private WeatherProvider _WeatherProvider;
 
         public MainWindow()
         {
@@ -41,8 +42,9 @@ namespace Infomator
             SetWeather(string.Empty, string.Empty);
             SetNewsContent(string.Empty);
 
-            // ニュースを取得するオブジェクト
+            // Webから情報を持ってくる
             _NewsProvider = new NewsProvider();
+            _WeatherProvider = new WeatherProvider();
 
             // 設定ファイルの準備
             Settings.Settings.CreateDefaultSettings();
@@ -81,6 +83,8 @@ namespace Infomator
         private void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
             UpdateHeadlines();
+
+            _WeatherProvider.GetWeather(() => { });
         }
 
         private void OnClickNewsContent(object sender, MouseButtonEventArgs e)

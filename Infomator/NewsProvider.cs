@@ -51,11 +51,7 @@ namespace Infomator
             Task task = Task.Run(() =>
             {
                 string url = string.Format(_TopicBaseUrl, topic.ToString(), _LanguageQuery);
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                request.Method = "GET";
-
-                var response = request.GetResponse();
-                Stream responseStream = response.GetResponseStream();
+                Stream responseStream = InfomatorHelper.GetGET(url);
 
                 // XMLが返ってくるのでパースする
                 XmlDocument xmlDocument = new XmlDocument();
@@ -67,6 +63,7 @@ namespace Infomator
                 _Index = 0;
 
                 onLoaded();
+                responseStream.Close();
             });
         }
 
