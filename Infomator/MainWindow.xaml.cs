@@ -16,6 +16,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Infomator
 {
@@ -24,6 +25,8 @@ namespace Infomator
     /// </summary>
     public partial class MainWindow : Window
     {
+        private NewsProvider _NewsProvider;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -32,7 +35,9 @@ namespace Infomator
             FixWindowPosition();
 
             SetWeather("Sendai, Miyagi", "20℃, 50%");
-            SetNewsContent("週末は九州で大雨に厳重警戒　道路冠水や河川増水のおそれも");
+            SetNewsContent("");
+
+            _NewsProvider = new NewsProvider();
         }
 
         public static void OpenUrl(string url)
@@ -66,22 +71,65 @@ namespace Infomator
         #region private callback
         private void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
-            StartAnimation();
+            UpdateHeadlines();
         }
 
         private void OnClickNewsContent(object sender, MouseButtonEventArgs e)
         {
-            var newsProvider = new NewsProvider();
+            var currentHeadline = _NewsProvider.CurrentHeadline;
+            if(currentHeadline != null)
+            {
+                OpenUrl(currentHeadline.Url);
+            }
         }
         #endregion
 
         #region private methods
+        private void UpdateHeadlines()
+        {
+            // ニュースを取得して、Loopを開始する
+            _NewsProvider.GetRSSDocument(NewsTopic.TECHNOLOGY, () => SetNextHeadline());
+        }
+
+        private void SetNextHeadline()
+        {
+            var currentHeadline = _NewsProvider.GetNext();
+            if(currentHeadline != null)
+            {
+                var title = currentHeadline.Title;
+                var link = currentHeadline.Url;
+
+                Console.WriteLine(currentHeadline.ToString());
+
+                Dispatcher.Invoke(() =>
+                {
+                    SetNewsContent(title);
+                    DoEvents();
+                });
+                Dispatcher.Invoke(() => StartAnimation((sender, e) => SetNextHeadline()));
+            }
+            else
+            {
+                Console.WriteLine("SetNextHeadline() > UpdateHeadlines()");
+                // nullなら再取得
+                UpdateHeadlines();
+            }
+        }
+
         private void StartAnimation(EventHandler onComplete = null)
         {
+            // UIのレイアウト更新
+            NewsCanvas.UpdateLayout();
+            NewsContentText.UpdateLayout();
+
             // 横幅いっぱいを通過するのにかける時間
-            int secondsPerWidth = 10;
+            int secondsPerWidth = 3;
             int repeatCount = 2;
             int duration = (int)Math.Round(NewsContentText.ActualWidth * 2 / this.Width) * secondsPerWidth;
+
+            Console.WriteLine(string.Format("TextWidth: {0}, CanvasWidth: {1}", NewsCanvas.ActualWidth, NewsContentText.ActualWidth));
+            Console.WriteLine("/Width: " + (int)Math.Round(NewsContentText.ActualWidth * 2 / this.Width));
+            Console.WriteLine("ScrollDuration: " + duration);
 
             // 横幅当たりの経過時間を計算する
             DoubleAnimation animation = new DoubleAnimation();
@@ -90,7 +138,7 @@ namespace Infomator
             animation.Duration = new Duration(TimeSpan.FromSeconds(duration));
             animation.RepeatBehavior = new RepeatBehavior(repeatCount);
 
-            if(onComplete != null)
+            if (onComplete != null)
             {
                 animation.Completed += onComplete;
             }
@@ -103,6 +151,20 @@ namespace Infomator
             this.WindowStartupLocation = WindowStartupLocation.Manual;
             this.Top = SystemParameters.WorkArea.Height - this.Height;
             this.Left = SystemParameters.WorkArea.Width - this.Width;
+        }
+
+        // 再描画
+        private void DoEvents()
+        {
+            DispatcherFrame frame = new DispatcherFrame();
+            var callback = new DispatcherOperationCallback(obj =>
+            {
+                ((DispatcherFrame)obj).Continue = false;
+                return null;
+            });
+
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, callback, frame);
+            Dispatcher.PushFrame(frame);
         }
 
         #endregion
