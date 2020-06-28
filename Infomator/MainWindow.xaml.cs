@@ -83,8 +83,7 @@ namespace Infomator
         private void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
             UpdateHeadlines();
-
-            _WeatherProvider.GetWeather(() => { });
+            UpdateWeather();
         }
 
         private void OnClickNewsContent(object sender, MouseButtonEventArgs e)
@@ -104,6 +103,19 @@ namespace Infomator
             _NewsProvider.GetRSSDocument(Settings.Settings.UserNewsAPI.Topic, () => SetNextHeadline());
         }
 
+        private void UpdateWeather()
+        {
+            // 別スレッドで天気を取得
+            _WeatherProvider.GetWeather((weather) =>
+            {
+                // UIを更新
+                Dispatcher.Invoke(() =>
+                {
+                    SetWeather(weather.Location, string.Format("{0}, {1}℃ - {2}℃", weather.Main, weather.TemperatureMin, weather.TemperatureMax));
+                });
+            });
+        }
+
         private void SetNextHeadline()
         {
             var currentHeadline = _NewsProvider.GetNext();
@@ -114,12 +126,16 @@ namespace Infomator
 
                 Console.WriteLine(currentHeadline.ToString());
 
+                // UIを更新
                 Dispatcher.Invoke(() =>
                 {
                     SetNewsContent(title);
                     DoEvents();
                 });
                 Dispatcher.Invoke(() => StartAnimation((sender, e) => SetNextHeadline()));
+                
+                // 天気も更新
+                UpdateWeather();
             }
             else
             {

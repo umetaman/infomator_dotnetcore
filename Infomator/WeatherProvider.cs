@@ -53,15 +53,15 @@ namespace Infomator
         private static readonly string _BaseUrl = "http://api.openweathermap.org/data/2.5/weather?units=metric&{0}";
         private static readonly string _Query = "q={0}&APPID={1}";
 
-        public void GetWeather(Action onLoaded)
+        public void GetWeather(Action<Weather> onLoaded)
         {
             var key = Settings.Settings.UserWeatherAPI.AccessKey;
             var location = Settings.Settings.UserWeatherAPI.Location;
-            Task task = Task.Run(() => GetWeatherThread(key, location, () => { }));
+            Task task = Task.Run(() => GetWeatherThread(key, location, onLoaded));
         }
 
         // Taskに渡す用
-        private void GetWeatherThread(string key, string location, Action onLoaded)
+        private void GetWeatherThread(string key, string location, Action<Weather> onLoaded)
         {
             string url = string.Format(_BaseUrl, string.Format(_Query, location, key));
             Stream responseStream = InfomatorHelper.GetGET(url);
@@ -70,7 +70,7 @@ namespace Infomator
             responseStream.Close();
 
             var weather = Weather.FromJson(text);
-            Console.WriteLine(weather.ToString());
+            onLoaded(weather);
         }
     }
 }
