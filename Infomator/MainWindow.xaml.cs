@@ -17,9 +17,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Infomator.Settings;
 
 namespace Infomator
 {
+    using Settings;
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -38,7 +41,12 @@ namespace Infomator
             SetWeather(string.Empty, string.Empty);
             SetNewsContent(string.Empty);
 
+            // ニュースを取得するオブジェクト
             _NewsProvider = new NewsProvider();
+
+            // 設定ファイルの準備
+            Settings.Settings.CreateDefaultSettings();
+            Settings.Settings.Read();
         }
 
         public static void OpenUrl(string url)
