@@ -97,7 +97,7 @@ namespace Infomator
         private void UpdateHeadlines()
         {
             // ニュースを取得して、Loopを開始する
-            _NewsProvider.GetRSSDocument(NewsTopic.TECHNOLOGY, () => SetNextHeadline());
+            _NewsProvider.GetRSSDocument(Settings.Settings.UserNewsAPI.Topic, () => SetNextHeadline());
         }
 
         private void SetNextHeadline()
@@ -134,9 +134,11 @@ namespace Infomator
             // 横幅いっぱいを通過するのにかける時間
             int secondsPerWidth = 3;
             int repeatCount = 2;
-            int duration = (int)Math.Round(NewsContentText.ActualWidth * 2 / this.Width) * secondsPerWidth;
+            int duration = this.Width > NewsContentText.ActualWidth * 2 ? 
+                5 :
+                (int)Math.Round(NewsContentText.ActualWidth * 2 / this.Width) * secondsPerWidth * 2;
 
-            Console.WriteLine(string.Format("TextWidth: {0}, CanvasWidth: {1}", NewsCanvas.ActualWidth, NewsContentText.ActualWidth));
+            Console.WriteLine(string.Format("TextWidth: {0}, CanvasWidth: {1}", NewsContentText.ActualWidth, NewsCanvas.ActualWidth));
             Console.WriteLine("/Width: " + (int)Math.Round(NewsContentText.ActualWidth * 2 / this.Width));
             Console.WriteLine("ScrollDuration: " + duration);
 

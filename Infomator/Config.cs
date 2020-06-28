@@ -9,6 +9,11 @@ using Newtonsoft.Json.Linq;
 
 namespace Infomator.Settings
 {
+    public class General
+    {
+
+    }
+
     public class WeatherAPI
     {
         // APIキーは絶対にデフォルトで指定しちゃだめ。ユーザーに取得してもらう。
@@ -127,13 +132,12 @@ namespace Infomator.Settings
 
         public static void CreateDefaultSettings()
         {
-#if !DEBUG
             if (File.Exists(_DefaultSettingFilePath))
             {
                 // すでに存在しているときは作成しない
+                Console.WriteLine("Settings File already exists.");
                 return;
             }
-#endif
 
             JObject defaultJsonData = new JObject(
                 new JProperty(_VersionDataKey, Version),
