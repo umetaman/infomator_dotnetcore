@@ -34,8 +34,9 @@ namespace Infomator
             // ウィンドウの位置を固定
             FixWindowPosition();
 
-            SetWeather("Sendai, Miyagi", "20℃, 50%");
-            SetNewsContent("");
+            // テキストを初期化
+            SetWeather(string.Empty, string.Empty);
+            SetNewsContent(string.Empty);
 
             _NewsProvider = new NewsProvider();
         }

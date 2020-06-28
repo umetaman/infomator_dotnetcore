@@ -18,12 +18,12 @@
             <RowDefinition x:Name="NewsContent" Height="1*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"></ColumnDefinition>
             <ColumnDefinition Width="5*"></ColumnDefinition>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Image HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Margin="10,10,10,10" Source="/VisualStudio2019_Icon.png" Grid.RowSpan="2"/>
-        <TextBlock x:Name="WeatherLocationText" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="14"/>
-        <TextBlock x:Name="WeatherContentText" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="14"/>
+        <Image HorizontalAlignment="Center" Grid.Column="1" VerticalAlignment="Center" Stretch="Uniform" Margin="10,10,10,10" Source="/VisualStudio2019_Icon.png" Grid.RowSpan="2"/>
+        <TextBlock x:Name="WeatherLocationText" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" Margin="10,0,10,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="14"/>
+        <TextBlock x:Name="WeatherContentText" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" Margin="10,0,10,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="14"/>
         <Canvas Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" x:Name="NewsCanvas" VerticalAlignment="Stretch" Background="#7FFFFF00" MouseLeftButtonDown="OnClickNewsContent" >
             <TextBlock Name="NewsContentText" Text="TextBlock" TextWrapping="NoWrap" FontSize="14" Canvas.Top="7">
             This is a news content. This is a news content. This is a news content.
